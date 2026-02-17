@@ -119,6 +119,7 @@
 }
 
 .symbol-dropdown-list {
+  overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: #EBB30B #1a1a1a;
 }

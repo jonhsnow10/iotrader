@@ -17,6 +17,7 @@ import { PerpOrderEntry } from '../components/futures/PerpOrderEntry';
 import { CustomBottomTabs } from '../components/futures/CustomBottomTabs';
 import { MobileTradingTabs } from '../components/futures/MobileTradingTabs';
 import { CustomTradingView } from '../components/futures/TradingView';
+import { TooltipOptionsProvider } from '../components/ui/InfoTooltip';
 
 const ORDERLY_SUPPORTED_CHAINS = [
   { evmChainId: 1 },
@@ -168,6 +169,7 @@ const FutureTrading = () => {
         <div className="flex flex-col min-h-[100dvh] lg:min-h-screen bg-[#080808] overflow-x-hidden lg:overflow-visible pb-[env(safe-area-inset-bottom)]">
         <Header />
         <OrderlyConnect />
+        <TooltipOptionsProvider value={{ disableTooltipsOnMobile: true }}>
         <TradingLayout
           header={
             <FutureTradingHeader
@@ -192,6 +194,7 @@ const FutureTrading = () => {
             />
           }
         />
+        </TooltipOptionsProvider>
       </div>
     </>
   );

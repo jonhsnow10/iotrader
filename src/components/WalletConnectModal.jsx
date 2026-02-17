@@ -5,6 +5,7 @@ import { detectInstalledWallets } from '../utils/walletDetectors';
 
 export function WalletConnectModal({ isOpen, onClose }) {
   const modalRef = useRef(null);
+  const onCloseRef = useRef(onClose);
   const { connectors, connectAsync, isPending } = useConnect();
   const [isLoading, setIsLoading] = useState(false);
   const installedWallets = React.useMemo(() => {
@@ -12,35 +13,46 @@ export function WalletConnectModal({ isOpen, onClose }) {
     return detected.filter((w) => w.detected);
   }, []);
 
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     const h = (e) => {
-      if (modalRef.current && !modalRef.current.contains(e.target)) onClose();
+      if (modalRef.current && !modalRef.current.contains(e.target)) onCloseRef.current();
     };
     if (isOpen) {
       document.addEventListener('mousedown', h);
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      const prevOverflow = document.body.style.overflow;
-      const prevPaddingRight = document.body.style.paddingRight;
+      const html = document.documentElement;
+      const prevHtmlOverflow = html.style.overflow;
+      const prevHtmlPaddingRight = html.style.paddingRight;
+      const prevBodyOverflow = document.body.style.overflow;
+      const prevBodyPaddingRight = document.body.style.paddingRight;
+
+      html.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
       if (scrollbarWidth > 0) {
+        html.style.paddingRight = `${scrollbarWidth}px`;
         document.body.style.paddingRight = `${scrollbarWidth}px`;
       }
+
       return () => {
         document.removeEventListener('mousedown', h);
-        document.body.style.overflow = prevOverflow;
-        document.body.style.paddingRight = prevPaddingRight;
+        html.style.overflow = prevHtmlOverflow;
+        html.style.paddingRight = prevHtmlPaddingRight;
+        document.body.style.overflow = prevBodyOverflow;
+        document.body.style.paddingRight = prevBodyPaddingRight;
       };
     }
     return () => document.removeEventListener('mousedown', h);
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   useEffect(() => {
     const h = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') onCloseRef.current();
     };
     if (isOpen) document.addEventListener('keydown', h);
     return () => document.removeEventListener('keydown', h);
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   const handleConnect = async (walletId) => {
     if (isLoading || isPending) return;

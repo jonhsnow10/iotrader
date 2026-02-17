@@ -99,7 +99,7 @@ export function FutureTradingHeader({ markets, symbol, onSymbolChange, ticker, f
             {isOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => { setIsOpen(false); setSymbolSearch(''); }} aria-hidden />
-                <div className="absolute top-full left-0 mt-2 z-50 w-full max-w-[210px] max-h-[60vh] overflow-hidden flex flex-col rounded-[10px] bg-[#0A0A0A] border border-[#EBB30B] shadow-2xl">
+                <div className="absolute top-full left-0 mt-2 z-50 w-full min-w-[280px] max-w-[360px] w-max max-h-[60vh] overflow-hidden flex flex-col rounded-[10px] bg-[#0A0A0A] border border-[#EBB30B] shadow-2xl">
                   <div className="p-2 border-b border-[#EBB30B]/30 sticky top-0 bg-[#0A0A0A] z-10">
                     <input
                       type="text"
@@ -211,7 +211,7 @@ export function FutureTradingHeader({ markets, symbol, onSymbolChange, ticker, f
                     background: 'linear-gradient(90deg, rgba(202, 138, 4, 0.4) 0%, rgba(250, 204, 21, 0.4) 100%)',
                   }}
                 >
-                  PER
+                  PERP
                 </span>
               </div>
             </div>
@@ -222,7 +222,7 @@ export function FutureTradingHeader({ markets, symbol, onSymbolChange, ticker, f
           {isOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => { setIsOpen(false); setSymbolSearch(''); }} aria-hidden />
-              <div className="absolute top-full left-0 mt-2 z-50 w-full max-w-[210px] max-h-[60vh] overflow-hidden flex flex-col rounded-[10px] bg-[#0A0A0A] border border-[#EBB30B] shadow-2xl">
+              <div className="absolute top-full left-0 mt-2 z-50 w-full min-w-[280px] max-w-[360px] w-max max-h-[60vh] overflow-hidden flex flex-col rounded-[10px] bg-[#0A0A0A] border border-[#EBB30B] shadow-2xl">
                 <div className="p-2 border-b border-[#EBB30B]/30 sticky top-0 bg-[#0A0A0A] z-10">
                   <input
                     type="text"
