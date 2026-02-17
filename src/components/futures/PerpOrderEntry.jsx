@@ -879,7 +879,7 @@ export function PerpOrderEntry({ symbol }) {
             showUnderline={false}
           >
             <span className="text-sm font-sans font-bold text-[#FFFFFF]">
-              Avbl
+              Available
             </span>
           </InfoTooltip>
           <span className="text-sm font-sans font-medium text-[#FFFFFF]">
