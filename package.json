@@ -1,0 +1,68 @@
+{
+  "name": "react-app",
+  "version": "1.0.0",
+  "description": "React example starter project",
+  "keywords": [
+    "react",
+    "starter"
+  ],
+  "main": "src/index.jsx",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=10.0.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@orderly.network/default-evm-adapter": "^2.9.1",
+    "@orderly.network/hooks": "^2.9.1",
+    "@orderly.network/trading-view": "^1.5.17",
+    "@orderly.network/web3-provider-ethers": "^2.9.1",
+    "@tanstack/react-query": "^5.90.21",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^2.1.1",
+    "axios": "^1.6.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "events": "^3.3.0",
+    "lightweight-charts": "^5.0.9",
+    "lucide-react": "^0.556.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet-async": "^2.0.5",
+    "react-router-dom": "^7.10.1",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5",
+    "viem": "^2.45.3",
+    "wagmi": "^3.4.3"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "vite": "^5.0.0",
+    "vite-plugin-node-polyfills": "^0.25.0"
+  },
+  "overrides": {
+    "ajv": "^8.17.1",
+    "schema-utils": {
+      "ajv": "^6.12.6",
+      "ajv-keywords": "^3.5.2"
+    },
+    "fork-ts-checker-webpack-plugin": {
+      "schema-utils": {
+        "ajv": "^6.12.6",
+        "ajv-keywords": "^3.5.2"
+      }
+    }
+  }
+}

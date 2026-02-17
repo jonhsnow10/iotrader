@@ -1,0 +1,97 @@
+/* =================================================================
+   TRADINGVIEW CHART OVERRIDES - STABLE SELECTORS ONLY
+   =================================================================
+   
+   WARNING: Do NOT use hashed class names (e.g., .legend-29zvAld0)
+   They change between TradingView versions and will break silently.
+   
+   ✅ USE: CSS custom properties, stable class patterns, HTML structure
+   ❌ AVOID: Hashed class names, !important for visibility/display
+   ================================================================= */
+
+/* ============================================
+   TradingView CSS Custom Properties (Safe)
+   ============================================ */
+.theme-dark:root {
+  --tv-color-platform-background: #171717;
+  --tv-color-pane-background: #171717;
+  --tv-color-pane-background-secondary: #171717;
+  --tv-color-toolbar-button-background-hover: #1F1F1F;
+  --tv-color-toolbar-button-background-secondary-hover: #1F1F1F;
+  --tv-color-toolbar-button-background-expanded: #1F1F1F;
+  --tv-color-toolbar-toggle-button-background-active: #FFF800;
+  --tv-color-toolbar-toggle-button-background-active-hover: #E6E000;
+  --tv-color-toolbar-icon: #FFF800;
+  --tv-color-toolbar-icon-hover: #FFF800;
+  --tv-color-toolbar-icon-active: #FFF800;
+}
+
+/* ============================================
+   Chart Container (Stable selectors)
+   ============================================ */
+.chart-page .chart-container-border {
+  background-color: #171717;
+  border: none;
+}
+
+/* ============================================
+   Hide specific TradingView panels (Stable)
+   ============================================ */
+.layout__area--right {
+  /* Hide right panel if not needed */
+  /* Comment out if you need the right panel */
+  /* display: none; */
+}
+
+/* ============================================
+   Loading Indicator
+   ============================================ */
+#loading-indicator .tv-spinner {
+  border-color: #FFF800 transparent transparent transparent;
+}
+
+/* ============================================
+   Selection Color
+   ============================================ */
+html.theme-dark ::selection {
+  background: rgba(255, 248, 0, 0.2);
+  color: #FFFFFF;
+}
+
+/* ============================================
+   Toolbar Icon Colors
+   ============================================ */
+.chart-controls-bar svg,
+.chart-controls-bar path,
+.chart-toolbar svg,
+.chart-toolbar path,
+.group-toolbar svg,
+.group-toolbar path,
+[class*="toolbar"] svg,
+[class*="toolbar"] path,
+[class*="control"] svg,
+[class*="control"] path {
+  fill: #FFF800;
+  stroke: #FFF800;
+}
+
+.chart-controls-bar button:hover svg,
+.chart-controls-bar button:hover path,
+.chart-toolbar button:hover svg,
+.chart-toolbar button:hover path,
+[class*="toolbar"] button:hover svg,
+[class*="toolbar"] button:hover path {
+  fill: #FFF800;
+  stroke: #FFF800;
+  opacity: 0.8;
+}
+
+.chart-controls-bar button[aria-pressed="true"] svg,
+.chart-controls-bar button[aria-pressed="true"] path,
+[class*="toolbar"] button[aria-pressed="true"] svg,
+[class*="toolbar"] button[aria-pressed="true"] path,
+[class*="toolbar"] button.active svg,
+[class*="toolbar"] button.active path {
+  fill: #FFF800 !important;
+  stroke: #FFF800 !important;
+}
