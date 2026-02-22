@@ -1,0 +1,226 @@
+/* User Dashboard – Future Trading + Portfolio mix (iotrader future trading design) */
+/* Uses same colors/fonts as futuremarket: #050505, #111, #1a1a1a, yellow-500, border-yellow-500 */
+
+.user-dashboard-ft {
+  font-family: 'Geist', var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Portfolio header – future trading style title */
+.user-dashboard-ft .ud-ft-title {
+  font-weight: 800;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.user-dashboard-ft .ud-ft-subtitle {
+  font-weight: 600;
+  font-size: clamp(16px, 2vw, 20px);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.user-dashboard-ft .ud-ft-accent {
+  color: var(--color-accent-primary);
+}
+
+/* Main portfolio value card – future trading panel (like TradingChartVisual wrapper) */
+.user-dashboard-ft .ud-ft-panel {
+  background: #111;
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.user-dashboard-ft .ud-ft-panel-highlight {
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 30px rgba(234, 179, 8, 0.15);
+}
+
+/* Small uppercase labels like future trading (AMOUNT, LEVERAGE, etc.) */
+.user-dashboard-ft .ud-ft-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.user-dashboard-ft .ud-ft-value {
+  font-weight: 700;
+  color: #fff;
+}
+
+.user-dashboard-ft .ud-ft-value-mono {
+  font-family: ui-monospace, monospace;
+}
+
+/* Primary button – future trading yellow */
+.user-dashboard-ft .ud-ft-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  padding: 0 1.5rem;
+  font-weight: 800;
+  font-size: 0.875rem;
+  color: #000;
+  background: var(--color-accent-primary);
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.user-dashboard-ft .ud-ft-btn-primary:hover {
+  background: var(--color-accent-primary-hover);
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
+}
+
+/* Secondary – future trading dark panel with yellow border */
+.user-dashboard-ft .ud-ft-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  padding: 0 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #fff;
+  background: #1a1a1a;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.user-dashboard-ft .ud-ft-btn-secondary:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+}
+
+/* Referral / generic card – same as future trading card */
+.user-dashboard-ft .ud-ft-card {
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+}
+
+.user-dashboard-ft .ud-ft-input {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, monospace;
+}
+
+.user-dashboard-ft .ud-ft-input:focus {
+  outline: none;
+  border-color: var(--color-accent-primary);
+}
+
+/* Summary section badge – future trading step badge style */
+.user-dashboard-ft .ud-ft-summary-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 1rem;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #000;
+  background: var(--color-accent-primary);
+  border-radius: 0.5rem;
+}
+
+/* Tabs – future trading panel toggle (Limit / Market style) */
+.user-dashboard-ft .ud-ft-tabs {
+  display: flex;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.user-dashboard-ft .ud-ft-tab {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.user-dashboard-ft .ud-ft-tab:hover {
+  color: #fff;
+}
+
+.user-dashboard-ft .ud-ft-tab-active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Position / prediction row – future trading list row */
+.user-dashboard-ft .ud-ft-row {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.user-dashboard-ft .ud-ft-row:hover {
+  border-color: rgba(234, 179, 8, 0.25);
+}
+
+/* Badge LONG/YES – future trading BUY LONG green */
+.user-dashboard-ft .ud-ft-badge-long {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #000;
+  background: var(--color-accent-primary);
+  border-radius: 0.5rem;
+}
+
+/* Badge SHORT/NO – future trading SELL SHORT rose */
+.user-dashboard-ft .ud-ft-badge-short {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #f43f5e;
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  border-radius: 0.5rem;
+}
+
+.user-dashboard-ft .ud-ft-badge-neutral {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.5rem;
+}
+
+/* PnL colors – future trading emerald/rose */
+.user-dashboard-ft .ud-ft-pnl-up {
+  color: #34d399;
+}
+
+.user-dashboard-ft .ud-ft-pnl-down {
+  color: #f43f5e;
+}
+
+/* Summary grid divider */
+@media (min-width: 1024px) {
+  .user-dashboard-ft .ud-ft-summary-grid > div + div {
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    padding-left: 1.5rem;
+  }
+}

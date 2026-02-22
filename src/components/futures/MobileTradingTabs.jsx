@@ -120,11 +120,11 @@ export function MobileTradingTabs({
     <div className="flex flex-col bg-[#080808] w-full">
       <div className="w-full">
         {viewMode === 'trade' ? (
-          <div className="grid w-full grid-cols-1 min-[360px]:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] min-h-[320px]">
-            <div className="min-w-0 min-h-[280px] min-[360px]:min-h-[320px] border-b border-[color:var(--color-border-strong)] min-[360px]:border-b-0 min-[360px]:border-r overflow-hidden flex flex-col">
+          <div className="grid w-full grid-cols-1 min-[360px]:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] min-h-[320px] max-h-[65vh] min-[360px]:max-h-[70vh]">
+            <div className={`min-w-0 min-h-[240px] min-[360px]:min-h-[280px] border-b border-[color:var(--color-border-strong)] min-[360px]:border-b-0 min-[360px]:border-r flex flex-col min-h-0 overflow-hidden ${orderBookContainerClassName || ''}`}>
               {orderBook}
             </div>
-            <div className="min-w-0 min-h-0">{orderEntry}</div>
+            <div className="min-w-0 min-h-0 overflow-auto">{orderEntry}</div>
           </div>
         ) : (
           <div className="w-full">
@@ -136,7 +136,7 @@ export function MobileTradingTabs({
                 activeTab === 'orderbook' ? 'h-[520px] min-h-0 overflow-hidden' : 'hidden'
               }`}
             >
-              <div className="w-full h-full flex flex-col min-h-0 overflow-hidden">
+              <div className={`w-full h-full flex flex-col min-h-0 overflow-hidden ${orderBookContainerClassName || ''}`}>
                 {orderBook}
               </div>
             </div>

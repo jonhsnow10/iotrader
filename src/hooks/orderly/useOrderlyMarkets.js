@@ -119,7 +119,9 @@ export function useOrderlyOrderBook(symbol, depth = 10) {
   const bids = Array.isArray(bookAny?.bids) ? bookAny.bids : [];
   const markPrice = typeof bookAny?.markPrice === 'number' ? bookAny.markPrice : 0;
   const hasBookShape = Array.isArray(bookAny?.asks) || Array.isArray(bookAny?.bids);
-  const isLoading = (streamControls?.isLoading ?? streamValue?.isLoading ?? !hasBookShape) ?? true;
+  const hasAnyLevels = bids.length > 0 || asks.length > 0;
+  const rawLoading = streamControls?.isLoading ?? streamValue?.isLoading ?? !hasBookShape;
+  const isLoading = hasAnyLevels ? false : (rawLoading ?? true);
 
   return { asks, bids, markPrice, isLoading };
 }
