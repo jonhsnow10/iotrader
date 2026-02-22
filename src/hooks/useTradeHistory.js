@@ -5,12 +5,16 @@ import { AccountStatusEnum } from '@orderly.network/types';
 const PAGE_SIZE = 10;
 
 function normalizeTrade(trade) {
+  const price = trade.executed_price;
+  const quantity = trade.executed_quantity;
   return {
     timestamp: trade.executed_timestamp,
     side: trade.side,
-    price: trade.executed_price,
-    quantity: trade.executed_quantity,
-    total: trade.executed_price * trade.executed_quantity,
+    price,
+    quantity,
+    total: price * quantity,
+    realized_pnl: trade.realized_pnl,
+    fee: trade.fee,
   };
 }
 

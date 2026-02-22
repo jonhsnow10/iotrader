@@ -8,6 +8,7 @@ import { getUserPositions, getMarketById } from "../services/marketService";
 import { getUserPredictions, getUserStats } from "../services/predictionService";
 import { getUserPoints } from "../services/pointsService";
 import { getReferralStats, getReferralLink } from "../services/referralService";
+import { PortfolioContent } from "../components/portfolio";
 
 const UserDashboard = () => {
   const { address, isConnected, balance, balanceSymbol } = useWallet();
@@ -122,16 +123,17 @@ const UserDashboard = () => {
       />
       <div className="min-h-screen pt-6 pb-20 px-4 lg:px-6">
         <div className="max-w-6xl mx-auto">
-          {/* Portfolio header */}
-          <div className="mb-6 lg:mb-8 animate-fade-in-up">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" style={{ fontFamily: "var(--font-geist-sans), monospace" }}>
-              Portfolio
-            </h1>
-            <p className="mt-2 text-lg sm:text-xl font-semibold text-white/90">Dashboard</p>
-            <p className="mt-1 text-sm text-gray-400">
-              Wallet: <span className="text-[var(--color-accent-primary)] font-mono">{isConnected ? formatAddress(address) : "Not Connected"}</span>
-            </p>
-          </div>
+          {/* Section 1: Dashboard */}
+          <section className="mb-12 lg:mb-16" aria-labelledby="dashboard-heading">
+            <div className="mb-6 lg:mb-8 animate-fade-in-up">
+              <h1 id="dashboard-heading" className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" style={{ fontFamily: "var(--font-geist-sans), monospace" }}>
+                Dashboard
+              </h1>
+              <div className="mt-2 h-0.5 w-full max-w-[100px] bg-[var(--color-accent-primary)]" />
+              <p className="mt-3 text-sm text-white/70">
+                Wallet: <span className="text-[var(--color-accent-primary)] font-mono">{isConnected ? formatAddress(address) : "Not Connected"}</span>
+              </p>
+            </div>
 
           {/* Main portfolio card */}
           <div className="rounded-2xl border border-white/20 bg-[rgba(7,7,7,0.93)] overflow-hidden mb-6 animate-fade-in-up shadow-xl">
@@ -452,6 +454,27 @@ const UserDashboard = () => {
               </div>
             </div>
           </div>
+          </section>
+
+          {/* Section 2: Portfolio */}
+          <section className="mb-8" aria-labelledby="portfolio-heading">
+            <div className="mb-6 lg:mb-8">
+              <h2 id="portfolio-heading" className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" style={{ fontFamily: "var(--font-geist-sans), monospace" }}>
+                Portfolio
+              </h2>
+              <div className="mt-2 h-0.5 w-full max-w-[100px] bg-[var(--color-accent-primary)]" />
+            </div>
+            <PortfolioContent
+              overrideTotalValue={portfolioValue}
+              isConnected={isConnected}
+              dailyPnL={{}}
+              renderDetailsContent={() => (
+                <p className="text-white/70 text-center py-6">
+                  View your positions and price predictions in the <strong>Dashboard</strong> section above.
+                </p>
+              )}
+            />
+          </section>
         </div>
       </div>
     </Layout>
