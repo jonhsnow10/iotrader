@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useChainId } from 'wagmi';
 import Header from '../components/Header';
 import SEO from '../components/SEO';
 import { useWallet } from '../hooks/useWallet';
 import { OrderlyConnect } from '../components/OrderlyConnect';
 import {
-  useOrderlyMarketData,
+  useOrderlyTicker,
   useOrderlyFundingRate,
   useOrderlyPerpetualMarkets,
 } from '../hooks/orderly/useOrderlyMarkets';
@@ -41,7 +41,7 @@ const FutureTrading = () => {
   const { isConnected } = useWallet();
 
   const { markets } = useOrderlyPerpetualMarkets();
-  const { ticker, orderbook: ob, trades } = useOrderlyMarketData(symbol);
+  const ticker = useOrderlyTicker(symbol);
   const fundingRate = useOrderlyFundingRate(symbol);
 
   const isChainSupported = ORDERLY_SUPPORTED_CHAINS.some((c) => c.evmChainId === chainId);
@@ -54,46 +54,6 @@ const FutureTrading = () => {
   const handleSymbolChange = useCallback((newSymbol) => {
     setSymbol(newSymbol);
   }, []);
-
-  const lastOrderbookRef = useRef({ bids: [], asks: [], isLoading: true });
-  useEffect(() => {
-    if (ob?.bids?.length || ob?.asks?.length) {
-      lastOrderbookRef.current = {
-        bids: ob.bids || [],
-        asks: ob.asks || [],
-        isLoading: ob?.isLoading ?? false,
-      };
-    }
-  }, [ob?.bids, ob?.asks, ob?.isLoading]);
-
-  const orderbookData = useMemo(() => {
-    const hasData = ob?.bids?.length || ob?.asks?.length;
-    if (hasData) {
-      return { bids: ob.bids || [], asks: ob.asks || [], isLoading: ob?.isLoading };
-    }
-    const last = lastOrderbookRef.current;
-    const hasStale = last.bids?.length || last.asks?.length;
-    if (hasStale) {
-      return { bids: last.bids, asks: last.asks, isLoading: ob?.isLoading ?? false };
-    }
-    return { bids: [], asks: [], isLoading: ob?.isLoading ?? true };
-  }, [ob?.bids, ob?.asks, ob?.isLoading]);
-
-  const tradesData = useMemo(() => {
-    if (trades?.trades?.length) {
-      return trades.trades.map((t, i) => ({
-        id: t.executed_timestamp ?? t.timestamp ?? i,
-        side: (t.side || 'BUY').toUpperCase(),
-        executed_price: t.executed_price ?? t.price,
-        price: t.executed_price ?? t.price,
-        executed_quantity: t.executed_quantity ?? t.quantity,
-        quantity: t.executed_quantity ?? t.quantity,
-        executed_timestamp: t.executed_timestamp ?? t.timestamp,
-        timestamp: t.executed_timestamp ?? t.timestamp,
-      }));
-    }
-    return [];
-  }, [trades?.trades]);
 
   const chartEl = (
     <div className="relative w-full h-full">
@@ -127,10 +87,8 @@ const FutureTrading = () => {
 
   const orderBookEl = (
     <FutureOrderBook
-      orderbook={orderbookData}
-      trades={tradesData}
+      symbol={symbol}
       onPriceClick={handleOrderbookPriceClick}
-      isLoading={ob?.isLoading}
     />
   );
 
