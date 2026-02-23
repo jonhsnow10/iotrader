@@ -20,7 +20,6 @@ const UserDashboard = () => {
   const [referralStats, setReferralStats] = useState(null);
   const [referralLink, setReferralLink] = useState("");
   const [copied, setCopied] = useState(false);
-  const [detailsTab, setDetailsTab] = useState("positions");
 
   const formatAddress = (addr) => {
     if (!addr) return "Not Connected";
@@ -127,7 +126,7 @@ const UserDashboard = () => {
           <section className="mb-12 lg:mb-16" aria-labelledby="dashboard-heading">
             <div className="mb-6 lg:mb-8 animate-fade-in-up">
               <h1 id="dashboard-heading" className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" style={{ fontFamily: "var(--font-geist-sans), monospace" }}>
-                Dashboard
+                Predictions
               </h1>
               <div className="mt-2 h-0.5 w-full max-w-[100px] bg-[var(--color-accent-primary)]" />
               <p className="mt-3 text-sm text-white/70">
@@ -251,13 +250,13 @@ const UserDashboard = () => {
                 </svg>
               </div>
               <div className="h-9 rounded-lg bg-[var(--color-accent-primary)] px-4 flex items-center">
-                <span className="font-semibold text-[#111] text-lg">Trading Summary</span>
+                <span className="font-semibold text-[#111] text-lg">Predictions Summary</span>
               </div>
             </div>
             <div className="rounded-2xl border border-white/20 bg-transparent overflow-hidden">
               <div className="p-5 sm:p-6 lg:p-7">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x lg:divide-white/20">
-                  <div>
+                  {/* <div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-white/80">Total positions</span>
                       <span className="text-sm font-semibold text-white">{positions.length}</span>
@@ -266,7 +265,7 @@ const UserDashboard = () => {
                       <span className="text-sm text-white/70">Total staked</span>
                       <span className="text-sm text-white">${totalStaked.toFixed(2)}</span>
                     </div>
-                  </div>
+                  </div> */}
                   <div className="lg:pl-6">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-white/80">Price predictions</span>
@@ -277,7 +276,7 @@ const UserDashboard = () => {
                       <span className="text-sm text-white">${totalPredictionsValue.toFixed(2)}</span>
                     </div>
                   </div>
-                  <div className="lg:pl-6">
+                  {/* <div className="lg:pl-6">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-white/80">Total trades</span>
                       <span className="text-sm font-semibold text-white">{totalTradesCount}</span>
@@ -292,13 +291,13 @@ const UserDashboard = () => {
                       <span className="text-sm font-medium text-white/80">Points</span>
                       <span className="text-sm font-semibold text-[var(--color-accent-primary)]">{totalPoints.toLocaleString()}</span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Details section with tabs (Positions | Predictions) */}
+          {/* Details section: Price Predictions */}
           <div className="animate-fade-in-up">
             <div className="flex items-center gap-4 mb-4 flex-wrap">
               <div className="h-8 w-8 rounded-md border border-white/40 flex items-center justify-center">
@@ -307,150 +306,74 @@ const UserDashboard = () => {
                   <path d="M16.6 10.6L16.5 16.2L10.4 16.3" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-white">Details</h3>
-              <div className="flex border border-white/30 rounded-lg overflow-hidden h-9">
-                <button
-                  type="button"
-                  onClick={() => setDetailsTab("positions")}
-                  className={`px-4 text-sm font-medium transition-colors ${detailsTab === "positions" ? "bg-white/15 text-white" : "text-white/60 hover:text-white"}`}
-                >
-                  Positions
-                </button>
-                <div className="w-px h-6 self-center bg-white/30" />
-                <button
-                  type="button"
-                  onClick={() => setDetailsTab("predictions")}
-                  className={`px-4 text-sm font-medium transition-colors ${detailsTab === "predictions" ? "bg-white/15 text-white" : "text-white/60 hover:text-white"}`}
-                >
-                  Price Predictions
-                </button>
-              </div>
+              <h3 className="text-xl font-semibold text-white">Price Predictions</h3>
             </div>
 
             <div className="rounded-2xl border border-white/20 bg-[rgba(7,7,7,0.93)] overflow-hidden">
               <div className="p-4 sm:p-6">
-                {loading ? (
+                {(loading ? (
                   <div className="text-center py-16">
                     <div className="animate-spin rounded-full h-12 w-12 border-2 border-[var(--color-accent-primary)] border-t-transparent mx-auto mb-4" />
                     <p className="text-white/60">Loading...</p>
                   </div>
-                ) : detailsTab === "positions" ? (
-                  positions.length === 0 ? (
-                    <div className="text-center py-16">
-                      <Icon name="Wallet" size={56} className="mx-auto mb-4 text-white/30" />
-                      <p className="text-white/80 text-lg mb-2">No positions yet</p>
-                      <p className="text-white/50 text-sm mb-6">Your market positions will appear here.</p>
-                      <Link
-                        to="/markets"
-                        className="inline-flex items-center justify-center h-10 rounded-full bg-[var(--color-accent-primary)] text-black font-bold px-6 text-sm hover:bg-[var(--color-accent-primary-hover)] transition-colors"
+                ) : predictions.length === 0 ? (
+                  <div className="text-center py-16">
+                    <Icon name="Wallet" size={56} className="mx-auto mb-4 text-white/30" />
+                    <p className="text-white/80 text-lg mb-2">No price predictions</p>
+                    <p className="text-white/50 text-sm mb-6">Your price predictions will appear here.</p>
+                    <Link
+                      to="/price-prediction"
+                      className="inline-flex items-center justify-center h-10 rounded-full bg-[var(--color-accent-primary)] text-black font-bold px-6 text-sm hover:bg-[var(--color-accent-primary-hover)] transition-colors"
+                    >
+                      Price Prediction
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {predictions.map((pred) => (
+                      <div
+                        key={pred.id}
+                        className="rounded-xl border border-white/10 bg-white/[0.02] p-4 sm:p-5 hover:border-white/20 transition-colors"
                       >
-                        Browse Markets
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {positions.map((position) => (
-                        <div
-                          key={position.id}
-                          className="rounded-xl border border-white/10 bg-white/[0.02] p-4 sm:p-5 hover:border-white/20 transition-colors"
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-white font-semibold truncate pr-2">{position.market}</h4>
-                              <p className="text-white/50 text-sm mt-1">{position.recentTrades}</p>
-                            </div>
-                            <span
-                              className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold ${
-                                position.outcome === "YES" || position.outcome === "LONG"
-                                  ? "bg-[var(--color-accent-primary)] text-black"
-                                  : "bg-[var(--color-accent-primary)]/20 text-[var(--color-accent-primary)] border border-[var(--color-accent-primary)]/50"
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-white font-semibold">{pred.symbol}</h4>
+                            <p className="text-white/50 text-sm mt-1">
+                              {pred.direction} · Target ${(pred.targetPrice || 0).toFixed(2)}
+                            </p>
+                          </div>
+                          <span className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-white/10 text-white border border-white/20">
+                            {pred.status || "Active"}
+                          </span>
+                        </div>
+                        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/10">
+                          <div>
+                            <p className="text-xs text-white/50 uppercase tracking-wider">Amount</p>
+                            <p className="text-white font-semibold">${(pred.amount || 0).toFixed(2)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-white/50 uppercase tracking-wider">Current</p>
+                            <p className="text-white font-semibold">${(pred.currentPrice || 0).toFixed(2)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-white/50 uppercase tracking-wider">Target</p>
+                            <p className="text-white font-semibold">${(pred.targetPrice || 0).toFixed(2)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-white/50 uppercase tracking-wider">P/L</p>
+                            <p
+                              className={`font-semibold ${
+                                pred.profitLoss != null && pred.profitLoss >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"
                               }`}
                             >
-                              {position.outcome}
-                            </span>
-                          </div>
-                          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/10">
-                            <div>
-                              <p className="text-xs text-white/50 uppercase tracking-wider">Staked</p>
-                              <p className="text-white font-semibold">${(position.totalStaked || 0).toFixed(2)}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-white/50 uppercase tracking-wider">Price</p>
-                              <p className="text-white font-semibold">${(position.price || 0).toFixed(2)}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-white/50 uppercase tracking-wider">Trades</p>
-                              <p className="text-white font-semibold">{position.trades ?? 0}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-white/50 uppercase tracking-wider">Value</p>
-                              <p className="text-white font-semibold">${(position.value || 0).toFixed(2)}</p>
-                            </div>
+                              {pred.profitLoss != null ? `$${Number(pred.profitLoss).toFixed(2)}` : "---"}
+                            </p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )
-                ) : (
-                  predictions.length === 0 ? (
-                    <div className="text-center py-16">
-                      <Icon name="Wallet" size={56} className="mx-auto mb-4 text-white/30" />
-                      <p className="text-white/80 text-lg mb-2">No price predictions</p>
-                      <p className="text-white/50 text-sm mb-6">Your price predictions will appear here.</p>
-                      <Link
-                        to="/price-prediction"
-                        className="inline-flex items-center justify-center h-10 rounded-full bg-[var(--color-accent-primary)] text-black font-bold px-6 text-sm hover:bg-[var(--color-accent-primary-hover)] transition-colors"
-                      >
-                        Price Prediction
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {predictions.map((pred) => (
-                        <div
-                          key={pred.id}
-                          className="rounded-xl border border-white/10 bg-white/[0.02] p-4 sm:p-5 hover:border-white/20 transition-colors"
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-white font-semibold">{pred.symbol}</h4>
-                              <p className="text-white/50 text-sm mt-1">
-                                {pred.direction} · Target ${(pred.targetPrice || 0).toFixed(2)}
-                              </p>
-                            </div>
-                            <span className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-white/10 text-white border border-white/20">
-                              {pred.status || "Active"}
-                            </span>
-                          </div>
-                          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/10">
-                            <div>
-                              <p className="text-xs text-white/50 uppercase tracking-wider">Amount</p>
-                              <p className="text-white font-semibold">${(pred.amount || 0).toFixed(2)}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-white/50 uppercase tracking-wider">Current</p>
-                              <p className="text-white font-semibold">${(pred.currentPrice || 0).toFixed(2)}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-white/50 uppercase tracking-wider">Target</p>
-                              <p className="text-white font-semibold">${(pred.targetPrice || 0).toFixed(2)}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-white/50 uppercase tracking-wider">P/L</p>
-                              <p
-                                className={`font-semibold ${
-                                  pred.profitLoss != null && pred.profitLoss >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"
-                                }`}
-                              >
-                                {pred.profitLoss != null ? `$${Number(pred.profitLoss).toFixed(2)}` : "---"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )
-                )}
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -460,7 +383,7 @@ const UserDashboard = () => {
           <section className="mb-8" aria-labelledby="portfolio-heading">
             <div className="mb-6 lg:mb-8">
               <h2 id="portfolio-heading" className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" style={{ fontFamily: "var(--font-geist-sans), monospace" }}>
-                Portfolio
+                Perpetual
               </h2>
               <div className="mt-2 h-0.5 w-full max-w-[100px] bg-[var(--color-accent-primary)]" />
             </div>
