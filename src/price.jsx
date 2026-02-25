@@ -26,38 +26,7 @@ const formatNumber = (value) =>
     maximumFractionDigits: 2,
   }).format(value);
 
-const generateTradeHistory = (count) => {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `trade-${i}`,
-    user: `0x${Math.random().toString(16).substr(2, 4)}...${Math.random()
-      .toString(16)
-      .substr(2, 4)}`,
-    outcome: Math.random() > 0.4 ? "YES" : "NO",
-    amount: (Math.random() * 500 + 10).toFixed(2),
-    price: (Math.random() * 0.9).toFixed(2),
-    time: `${Math.floor(Math.random() * 59)}m ago`,
-  }));
-};
-
 // --- DATA ---
-const marketData = {
-  id: "BI6OMIe3vj76k0kWWvQJ",
-  question: "BNB ALL TIME HIGH BY DECEMBER 31?",
-  icon: "Globe",
-  category: "Crypto",
-  volume: "$4,200,500",
-  liquidity: "$1,250,000",
-  endDate: "Dec 31, 2025",
-  description:
-    "This market resolves to YES if Binance Coin (BNB) reaches a new all-time high price (above $720.67) according to CoinGecko or Binance spot market data before December 31, 2025, 11:59 PM UTC.",
-  rules: [
-    "Resolution Source: CoinGecko / Binance Spot.",
-    "Threshold: > $720.67.",
-    "Timezone: UTC.",
-    "If the threshold is touched but not held, it counts as YES.",
-  ],
-};
-
 const footerLinks = {
   company: [
     { name: "About", url: "https://iotrader.io/about" },
@@ -243,27 +212,28 @@ const MarketHeader = ({ marketData }) => (
   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div className="flex items-start gap-4">
       <div>
-        <h1 className="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500 leading-tight mb-1">
-          {marketData.question}
-        </h1>
-        <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-gray-400">
-          <span className="bg-white/5 border border-white/5 px-2 py-0.5 rounded text-gray-300 flex items-center gap-1">
-            <Icon name="Globe" size={12} className="text-gray-400" />
+        <div className="flex flex-wrap items-center gap-3 text-[10px] leading-[12px] text-[#8E8E93] mb-2">
+          <span className="bg-[#080808] px-1.5 py-1 rounded-[4px] flex items-center gap-1 font-normal">
+            <Icon name="Globe" size={12} className="text-[#8E8E93]" />
             {marketData.category}
           </span>
-          <span className="flex items-center gap-1">
-            <Icon name="Clock" size={12} /> Ends: {marketData.endDate}
+          <span className="flex items-center gap-1.5 text-[12px] leading-[28px] text-[#757575]">
+            <Icon name="Clock" size={16} className="text-[#757575]" />
+            Ends: {marketData.endDate}
           </span>
           <span className="text-emerald-500 flex items-center gap-1">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>{" "}
             Live
           </span>
         </div>
+        <h1 className="text-[20px] font-semibold leading-[24px] text-white">
+          {marketData.question}
+        </h1>
       </div>
     </div>
     <div className="hidden md:flex gap-4 text-right">
       <div>
-        <div className="text-[10px] text-gray-500 font-bold uppercase">
+        <div className="text-[10px] text-[#757575] font-bold uppercase">
           Volume
         </div>
         <div className="text-sm font-mono font-bold text-white">
@@ -271,7 +241,7 @@ const MarketHeader = ({ marketData }) => (
         </div>
       </div>
       <div>
-        <div className="text-[10px] text-gray-500 font-bold uppercase">
+        <div className="text-[10px] text-[#757575] font-bold uppercase">
           Liquidity
         </div>
         <div className="text-sm font-mono font-bold text-white">
@@ -371,19 +341,32 @@ const PriceChart = ({ chartData }) => {
   const lastNoPoint = getLastPoint("no");
 
   return (
-    <div className="bg-[#000000] border border-white/10 rounded-2xl overflow-hidden relative shadow-2xl flex-1 flex flex-col">
-      <div className="p-4 border-b border-white/5 flex justify-between items-center">
+    <div className="box-border flex-1 flex flex-col rounded-2xl overflow-hidden relative bg-[rgba(8,8,8,0.6)] border border-[rgba(120,120,120,0.2)]">
+      <div className="p-4 border-b border-[rgba(120,120,128,0.16)] flex justify-between items-center">
         <span className="font-bold text-sm text-white">
           Price Movement Over Time
         </span>
-        <div className="flex gap-4 text-xs font-bold font-mono">
-          <span className="flex items-center gap-1 text-emerald-400">
-            <span className="w-2 h-2 rounded-full border border-emerald-400 bg-emerald-400/20"></span>{" "}
-            YES Price
-          </span>
-          <span className="flex items-center gap-1 text-rose-400">
-            <span className="w-2 h-2 rounded-full border border-rose-400 bg-rose-400/20"></span>{" "}
-            NO Price
+        <div className="flex flex-wrap items-center justify-between gap-4 flex-1">
+          <div className="flex gap-4 text-[10px] font-semibold leading-4 text-[#909090]">
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full border border-[#10B981] bg-[#10B981]/20"></span>{" "}
+              Long (0 users)
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full border border-[#F43F5E] bg-[#F43F5E]/20"></span>{" "}
+              Short (0 users)
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>{" "}
+              Winning (0)
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F43F5E]"></span>{" "}
+              Losing (0)
+            </span>
+          </div>
+          <span className="text-[10px] leading-4 text-[#909090] font-normal">
+            Connect your wallet to start making predictions
           </span>
         </div>
       </div>
@@ -454,7 +437,7 @@ const PriceChart = ({ chartData }) => {
           <path
             d={getSmoothPath("yes")}
             fill="none"
-            stroke="#34d399"
+            stroke="#10B981"
             strokeWidth="0.8"
             vectorEffect="non-scaling-stroke"
             strokeLinecap="round"
@@ -467,7 +450,7 @@ const PriceChart = ({ chartData }) => {
           <path
             d={getSmoothPath("no")}
             fill="none"
-            stroke="#fb7185"
+            stroke="#F43F5E"
             strokeWidth="0.8"
             vectorEffect="non-scaling-stroke"
             strokeLinecap="round"
@@ -484,7 +467,7 @@ const PriceChart = ({ chartData }) => {
                 cx={lastYesPoint.x}
                 cy={lastYesPoint.y}
                 r="0.8"
-                fill="#34d399"
+                fill="#10B981"
                 opacity="0.5"
                 filter="url(#glow-marker-yes)"
               />
@@ -493,7 +476,7 @@ const PriceChart = ({ chartData }) => {
                 cx={lastYesPoint.x}
                 cy={lastYesPoint.y}
                 r="0.5"
-                fill="#34d399"
+                fill="#10B981"
                 stroke="#000000"
                 strokeWidth="0.2"
                 filter="url(#glow-marker-yes)"
@@ -512,7 +495,7 @@ const PriceChart = ({ chartData }) => {
                 cx={lastNoPoint.x}
                 cy={lastNoPoint.y}
                 r="0.8"
-                fill="#fb7185"
+                fill="#F43F5E"
                 opacity="0.5"
                 filter="url(#glow-marker-no)"
               />
@@ -521,7 +504,7 @@ const PriceChart = ({ chartData }) => {
                 cx={lastNoPoint.x}
                 cy={lastNoPoint.y}
                 r="0.5"
-                fill="#fb7185"
+                fill="#F43F5E"
                 stroke="#000000"
                 strokeWidth="0.2"
                 filter="url(#glow-marker-no)"
@@ -551,7 +534,7 @@ const PriceChart = ({ chartData }) => {
                 cy={Math.max(5, Math.min(95, 95 - Math.max(0, Math.min(1, hoverData.yes)) * 90))}
                 r="0.6"
                 fill="#000000"
-                stroke="#34d399"
+                stroke="#10B981"
                 strokeWidth="1"
               />
               <circle
@@ -559,7 +542,7 @@ const PriceChart = ({ chartData }) => {
                 cy={Math.max(5, Math.min(95, 95 - Math.max(0, Math.min(1, hoverData.no)) * 90))}
                 r="0.6"
                 fill="#000000"
-                stroke="#fb7185"
+                stroke="#F43F5E"
                 strokeWidth="1"
               />
             </>
@@ -592,11 +575,11 @@ const PriceChart = ({ chartData }) => {
             <div className="text-white text-xs font-bold mb-2 text-center border-b border-white/10 pb-2">
               {hoverData.fullLabel}
             </div>
-            <div className="text-emerald-400 font-mono text-sm font-bold flex justify-between mb-1">
+            <div className="text-[#10B981] font-mono text-sm font-bold flex justify-between mb-1">
               <span>YES:</span>
               <span>${hoverData.yes.toFixed(2)}</span>
             </div>
-            <div className="text-rose-400 font-mono text-sm font-bold flex justify-between">
+            <div className="text-[#F43F5E] font-mono text-sm font-bold flex justify-between">
               <span>NO:</span>
               <span>${hoverData.no.toFixed(2)}</span>
             </div>
@@ -604,19 +587,19 @@ const PriceChart = ({ chartData }) => {
         )}
 
         {/* Y-axis Labels - Right side */}
-        <div className="absolute right-2 top-2 text-[10px] text-gray-400 font-mono font-bold">
+        <div className="absolute right-2 top-2 text-[11.8px] leading-4 text-[#909090] font-mono font-normal text-center">
           100%
         </div>
-        <div className="absolute right-2 top-[25%] text-[10px] text-gray-500 font-mono">
+        <div className="absolute right-2 top-[25%] text-[11.8px] leading-4 text-[#909090] font-mono text-center">
           75%
         </div>
-        <div className="absolute right-2 top-1/2 text-[10px] text-gray-400 font-mono font-bold">
+        <div className="absolute right-2 top-1/2 text-[11.8px] leading-4 text-[#909090] font-mono font-normal text-center">
           50%
         </div>
-        <div className="absolute right-2 top-[75%] text-[10px] text-gray-500 font-mono">
+        <div className="absolute right-2 top-[75%] text-[11.8px] leading-4 text-[#909090] font-mono text-center">
           25%
         </div>
-        <div className="absolute right-2 bottom-2 text-[10px] text-gray-400 font-mono font-bold">
+        <div className="absolute right-2 bottom-2 text-[11.8px] leading-4 text-[#909090] font-mono font-normal text-center">
           0%
         </div>
         
@@ -657,115 +640,77 @@ const TradingPanel = ({
   };
 
   return (
-    <div className="bg-[#111] border border-yellow-500/20 rounded-2xl p-6 relative shadow-2xl h-full flex flex-col gap-6">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50"></div>
+    <div className="box-border bg-[#111111] rounded-2xl py-8 px-6 h-full flex flex-col gap-6 relative">
+      <div className="border-b border-[rgba(60,60,67,0.18)] pb-4 flex flex-row items-center gap-2 shrink-0">
+        <h2 className="text-base font-bold text-white shrink-0">
+          Make a Prediction
+        </h2>
+      </div>
 
-      <h2 className="text-lg font-bold text-white flex items-center shrink-0">
-        <Icon
-          name="Check"
-          size={20}
-          className="text-yellow-500 mr-2"
-          strokeWidth={4}
-        />
-        Make a Prediction
-      </h2>
-
-      {/* Toggle Buttons */}
-      <div className="flex bg-[#0a0a0a] p-1 rounded-xl border border-white/10 shrink-0">
+      {/* Tabs: Buy (active) */}
+      <div className="flex flex-row justify-center items-center gap-4 shrink-0">
         <button
           onClick={() => setSelectedOutcome("YES")}
-          className={`flex-1 py-3 rounded-lg text-sm font-black uppercase transition-all flex items-center justify-center ${
+          className={`flex-1 py-3 rounded-lg text-base font-medium text-center transition-all flex flex-row justify-center items-center gap-2 ${
             selectedOutcome === "YES"
-              ? "bg-emerald-500 text-black shadow-lg shadow-emerald-500/20"
-              : "text-gray-500 hover:text-emerald-500 hover:bg-white/5"
+              ? "bg-[#31A75C] text-white backdrop-blur-xl"
+              : "text-[#737373] hover:text-white hover:bg-white/5"
           }`}
         >
-          <div
-            className={`w-2 h-2 rounded-full mr-2 ${
-              selectedOutcome === "YES"
-                ? "bg-black animate-pulse"
-                : "bg-gray-600"
-            }`}
-          ></div>
-          <div className="flex flex-col items-center">
-            <span>Buy Yes</span>
-            <span
-              className={`text-xs font-mono mt-0.5 ${
-                selectedOutcome === "YES" ? "text-black/70" : ""
-              }`}
-            >
-              ${(marketData?.yesPrice || 0.5).toFixed(2)}
-            </span>
-          </div>
+          <span>Yes</span>
         </button>
         <button
           onClick={() => setSelectedOutcome("NO")}
-          className={`flex-1 py-3 rounded-lg text-sm font-black uppercase transition-all flex items-center justify-center ${
+          className={`flex-1 py-3 rounded-lg text-base font-medium text-center transition-all flex flex-row justify-center items-center gap-2 ${
             selectedOutcome === "NO"
-              ? "bg-rose-500 text-black shadow-lg shadow-rose-500/20"
-              : "text-gray-500 hover:text-rose-500 hover:bg-white/5"
+              ? "bg-[#FF2D55] text-white"
+              : "text-[#737373] hover:text-white hover:bg-white/5"
           }`}
         >
-          <div
-            className={`w-2 h-2 rounded-full mr-2 ${
-              selectedOutcome === "NO"
-                ? "bg-black animate-pulse"
-                : "bg-gray-600"
-            }`}
-          ></div>
-          <div className="flex flex-col items-center">
-            <span>Buy No</span>
-            <span
-              className={`text-xs font-mono mt-0.5 ${
-                selectedOutcome === "NO" ? "text-black/70" : ""
-              }`}
-            >
-              ${(marketData?.noPrice || 0.5).toFixed(2)}
-            </span>
-          </div>
+          <span>No</span>
         </button>
       </div>
 
-      {/* Input Amount */}
-      <div className="shrink-0">
-        <div className="flex justify-between mb-2 text-xs font-bold text-white">
-          <span>Amount</span>
-          <span>Balance: 0.00 BNB</span>
-        </div>
-        <div
-          className={`bg-[#0a0a0a] border rounded-xl p-3 flex items-center transition-colors focus-within:border-opacity-100 ${
-            selectedOutcome === "YES"
-              ? "border-emerald-500/30 focus-within:border-emerald-500"
-              : "border-rose-500/30 focus-within:border-rose-500"
-          }`}
-        >
-          <input
-            type="number"
-            value={investAmount}
-            onChange={(e) => setInvestAmount(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="0.00"
-            className="bg-transparent w-full text-xl font-mono text-white outline-none placeholder-gray-700 no-spinner"
-          />
-          <span className="text-sm font-bold text-gray-400 ml-2">
-            {marketData?.stakeInUSDT ? 'USDT' : 'BNB'}
+      {/* Prediction Amount */}
+      <div className="shrink-0 flex flex-col gap-2 rounded-xl">
+        <div className="flex flex-row items-center justify-between gap-2">
+          <span className="text-sm font-medium leading-4 text-[#757575] tracking-[0.6px]">
+            Prediction Amount
           </span>
+        </div>
+        <div className="box-border flex flex-col gap-2 p-3 rounded-xl bg-[#1A1A1A] border-b border-[rgba(60,60,67,0.18)]">
+          <div className="flex flex-row items-center gap-2 flex-wrap">
+            <input
+              type="number"
+              value={investAmount}
+              onChange={(e) => setInvestAmount(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="0.00"
+              className="bg-transparent text-2xl font-medium leading-[29px] text-white outline-none placeholder-[#6B7280] no-spinner min-w-0 flex-1"
+            />
+            <span className="text-sm font-medium text-[#757575] ml-2">
+              {marketData?.stakeInUSDT ? "USDT" : "BNB"}
+            </span>
+          </div>
+          <p className="text-[10px] leading-3 text-[#6B7280]">
+            Enter the amount you want to predict with dollars.
+          </p>
         </div>
       </div>
 
       {/* Return Calculation */}
       <div className="bg-white/5 rounded-lg p-3 shrink-0">
-        <div className="flex justify-between text-xs text-gray-400 mb-1">
+        <div className="flex justify-between text-xs text-[#757575] mb-1">
           <span>Est. Price</span>
           <span className="text-white font-mono">
             ${(selectedOutcome === "YES" ? (marketData?.yesPrice || 0.5) : (marketData?.noPrice || 0.5)).toFixed(2)}
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-400 mb-1">
+        <div className="flex justify-between text-xs text-[#757575] mb-1">
           <span>Potential Payout</span>
           <span
             className={`font-mono font-bold ${
-              selectedOutcome === "YES" ? "text-emerald-400" : "text-rose-400"
+              selectedOutcome === "YES" ? "text-[#10B981]" : "text-[#F43F5E]"
             }`}
           >
             {investAmount
@@ -777,9 +722,9 @@ const TradingPanel = ({
             {marketData?.stakeInUSDT ? 'USDT' : 'BNB'}
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-400">
+        <div className="flex justify-between text-xs text-[#757575]">
           <span>ROI</span>
-          <span className="text-yellow-500 font-bold">
+          <span className="text-[#EBB30B] font-bold">
             {selectedOutcome === "YES" 
               ? `+${((1 / (marketData?.yesPrice || 0.5) - 1) * 100).toFixed(1)}%`
               : `+${((1 / (marketData?.noPrice || 0.5) - 1) * 100).toFixed(1)}%`}
@@ -789,15 +734,15 @@ const TradingPanel = ({
 
       {/* User Bet Info */}
       {userBet && (parseFloat(userBet.yesAmount) > 0 || parseFloat(userBet.noAmount) > 0) && (
-        <div className="bg-white/5 rounded-lg p-3 shrink-0 border border-yellow-500/20">
-          <div className="text-xs text-gray-400 mb-1">Your Position</div>
+        <div className="bg-white/5 rounded-lg p-3 shrink-0 border border-[rgba(120,120,120,0.2)]">
+          <div className="text-xs text-[#757575] mb-1">Your Position</div>
           {parseFloat(userBet.yesAmount) > 0 && (
-            <div className="text-xs text-emerald-400 font-bold">
+            <div className="text-xs text-[#10B981] font-bold">
               YES: {parseFloat(userBet.yesAmount).toFixed(4)} {marketData?.stakeInUSDT ? 'USDT' : 'BNB'}
             </div>
           )}
           {parseFloat(userBet.noAmount) > 0 && (
-            <div className="text-xs text-rose-400 font-bold">
+            <div className="text-xs text-[#F43F5E] font-bold">
               NO: {parseFloat(userBet.noAmount).toFixed(4)} {marketData?.stakeInUSDT ? 'USDT' : 'BNB'}
             </div>
           )}
@@ -816,10 +761,10 @@ const TradingPanel = ({
         <button
           onClick={onPlaceBet}
           disabled={!isConnected || isPending || isConfirming || !marketData?.isSmartContractMarket || !investAmount || parseFloat(investAmount) <= 0}
-          className={`w-full py-4 rounded-xl font-black uppercase tracking-wide text-sm shadow-xl transition-transform active:scale-[0.98] flex items-center justify-center ${
+          className={`w-full py-4 rounded-xl font-semibold uppercase tracking-[0.9px] text-[17.9px] leading-7 transition-transform active:scale-[0.98] flex items-center justify-center ${
             !isConnected || isPending || isConfirming || !marketData?.isSmartContractMarket || !investAmount || parseFloat(investAmount) <= 0
-              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-              : "bg-gradient-to-r from-yellow-600 to-yellow-400 text-black shadow-yellow-500/20 hover:shadow-yellow-500/40"
+              ? "bg-[#EBB30B] opacity-40 text-[#080808] cursor-not-allowed shadow-[0_0_15px_rgba(234,179,8,0.3)]"
+              : "bg-[#EBB30B] text-[#080808] shadow-[0_0_15px_rgba(234,179,8,0.3)] hover:opacity-90"
           }`}
         >
           {!isConnected ? (
@@ -834,10 +779,10 @@ const TradingPanel = ({
             <>
               <span className="relative flex h-2 w-2 mr-3">
                 <span
-                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-50 bg-black`}
+                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-50 bg-[#080808]`}
                 ></span>
                 <span
-                  className={`relative inline-flex rounded-full h-2 w-2 bg-black`}
+                  className={`relative inline-flex rounded-full h-2 w-2 bg-[#080808]`}
                 ></span>
               </span>
               Place Trade
@@ -1603,7 +1548,6 @@ const MarketDetail = () => {
         setAllTrades(Array.isArray(tradesData) ? tradesData : []);
         setComments(Array.isArray(commentsData) ? commentsData : []);
       } catch (e) {}
-      alert("Trade placed (demo mode).");
     } catch (error) {
       console.error("Error placing bet:", error);
       setTransactionError(error.message || "Transaction failed");
@@ -1657,7 +1601,7 @@ const MarketDetail = () => {
         ) : (
           <>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-fade-in-up">
-          <div className="lg:col-span-8 flex flex-col gap-6">
+          <div className="lg:col-span-8 flex flex-col gap-6 rounded-2xl bg-[rgba(116,116,128,0.08)] box-border">
             <MarketHeader marketData={marketData} />
             <PriceChart chartData={chartData} />
           </div>

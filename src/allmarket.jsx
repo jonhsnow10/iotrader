@@ -19,86 +19,6 @@ const categories = [
 // Current Date
 const TODAY = new Date().getTime();
 
-// Mock markets for fallback (will be replaced by Firebase data)
-const mockMarkets = [
-  {
-    id: 1,
-    category: "crypto",
-    question: "BNB all time high by December 31?",
-    closes: "Dec 31, 2025",
-    yesPrice: 0.67,
-    noPrice: 0.33,
-    volume: "4.2M",
-    liquidity: "1.2M",
-    isHot: true,
-  },
-  {
-    id: 2,
-    category: "crypto",
-    question: "Bitcoin to hit $100k before Q4?",
-    closes: "Oct 01, 2025", // Past
-    yesPrice: 0.42,
-    noPrice: 0.58,
-    volume: "18.5M",
-    liquidity: "5.4M",
-    isHot: false,
-  },
-  {
-    id: 3,
-    category: "sports",
-    question: "Real Madrid to win Champions League?",
-    closes: "May 31, 2025", // Past
-    yesPrice: 0.25,
-    noPrice: 0.75,
-    volume: "850K",
-    liquidity: "250K",
-    image: null,
-  },
-  {
-    id: 4,
-    category: "politics",
-    question: "Fed Interest Rate Cut in next meeting?",
-    closes: "Dec 15, 2025", // Future (Live)
-    yesPrice: 0.85,
-    noPrice: 0.15,
-    volume: "2.1M",
-    liquidity: "800K",
-    image: null,
-    isHot: true,
-  },
-  {
-    id: 5,
-    category: "entertainment",
-    question: "Taylor Swift album release in 2025?",
-    closes: "Dec 31, 2025", // Future
-    yesPrice: 0.92,
-    noPrice: 0.08,
-    volume: "150K",
-    liquidity: "45K",
-    image: null,
-  },
-  {
-    id: 6,
-    category: "crypto",
-    question: "Ethereum Flippening (Market Cap > BTC)?",
-    closes: "Dec 31, 2026", // Future
-    yesPrice: 0.12,
-    noPrice: 0.88,
-    volume: "3.3M",
-    liquidity: "900K",
-  },
-  {
-    id: 7,
-    category: "politics",
-    question: "Midterm Election Result: Democratic Majority?",
-    closes: "Nov 05, 2025", // Past
-    yesPrice: 0.45,
-    noPrice: 0.55,
-    volume: "12M",
-    liquidity: "3M",
-  },
-];
-
 // Sorting Helpers
 const getVolumeValue = (str) => {
   if (!str) return 0;
@@ -118,12 +38,29 @@ const getTimeValue = (str) => {
   return new Date(str).getTime();
 };
 
+const getClosesInDays = (closingTime) => {
+  if (!closingTime) return null;
+  const diff = closingTime - TODAY;
+  const days = Math.ceil(diff / (24 * 60 * 60 * 1000));
+  if (days < 0) return null;
+  if (days === 0) return "Closes today";
+  if (days === 1) return "Closes in 1 day";
+  return `Closes in ${days} days`;
+};
+
 // Network types
 const AllMarkets = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeSortFilter, setActiveSortFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [viewCols, setViewCols] = useState(3); // 1, 2, or 3 per row
+  const [viewDropdownOpen, setViewDropdownOpen] = useState(false);
   const [markets, setMarkets] = useState([]);
+  const searchInputRef = useRef(null);
+  const searchContainerRef = useRef(null);
+  const viewDropdownRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -244,14 +181,13 @@ const AllMarkets = () => {
             }
           }
         });
-        
-        // Use only Firebase markets (contract markets are excluded)
+
         setMarkets(uniqueFirebaseMarkets);
+        setError(null);
       } catch (err) {
         console.error("Error fetching markets:", err);
         setError(err.message);
-        // Fallback to mock data on error
-        setMarkets(mockMarkets);
+        setMarkets([]);
       } finally {
         setLoading(false);
       }
@@ -310,6 +246,35 @@ const AllMarkets = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [searchOpen]);
+
+  useEffect(() => {
+    if (!viewDropdownOpen) return;
+    const handleClickOutside = (e) => {
+      if (viewDropdownRef.current && !viewDropdownRef.current.contains(e.target)) {
+        setViewDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [viewDropdownOpen]);
+
+
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [searchOpen]);
 
 
   // Filter & Sort Logic
@@ -398,85 +363,188 @@ const AllMarkets = () => {
         keywords="prediction markets, all markets, crypto markets, sports betting, political predictions, market categories, trading markets"
         url="/markets"
       />
-      {/* CATEGORY BROWSER & SEARCH BAR */}
-      <div className="bg-[#080808] border-b border-yellow-500/20 pt-4 pb-4">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-col md:flex-row gap-4 justify-between items-center">
-          {/* Middle: Horizontal Category Scroll */}
-          <div className="relative flex-1 w-full md:w-auto min-w-0 mx-4">
-            <button
-              onClick={() => scroll("left")}
-              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-r from-[#080808] to-transparent h-full px-2 items-center text-gray-400 hover:text-white"
-            >
-              <Icon name="ChevronLeft" size={20} />
-            </button>
-            <div
-              ref={scrollContainerRef}
-              className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth px-6 md:px-8"
-            >
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide whitespace-nowrap transition-all border ${
-                    activeCategory === cat.id
-                      ? "bg-yellow-500 text-black border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]"
-                      : "bg-[#1a1a1a] text-gray-400 border-white/10 hover:border-white/30 hover:text-white"
-                  }`}
-                >
-                  <Icon name={cat.icon} size={14} />
-                  {cat.name}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => scroll("right")}
-              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-l from-[#080808] to-transparent h-full px-2 items-center text-gray-400 hover:text-white"
-            >
-              <Icon name="ChevronRight" size={20} />
-            </button>
+      {/* CATEGORY BROWSER & SEARCH BAR - full-width border, content aligned with main */}
+      <div className="bg-[#080808] w-full border-b border-[rgba(60,60,67,0.6)]">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-row items-center justify-between gap-6 h-[60px] pt-4">
+          {/* Tabs in the middle: centered, same width context as content below */}
+          <div
+            ref={scrollContainerRef}
+            className="flex flex-row items-center justify-start gap-4 md:gap-8 flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth font-inter"
+          >
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`flex flex-row justify-center items-center py-2 px-1 gap-2 flex-none whitespace-nowrap self-stretch transition-colors text-base leading-6 ${
+                  activeCategory === cat.id
+                    ? "border-b-2 border-[#EBB30B] font-bold text-white"
+                    : "font-light text-[#737373] hover:text-white"
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
           </div>
 
-          {/* Right: Search */}
-          <div className="relative w-full md:w-64">
-            <Icon
-              name="Search"
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-            />
-            <input
-              type="text"
-              placeholder="Search markets..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors"
-            />
+          {/* Right: Search, Filter, Info */}
+          <div className="flex flex-row items-center gap-2 flex-none shrink-0">
+            <div ref={searchContainerRef} className="relative flex items-center">
+              {searchOpen ? (
+                <div className="relative flex items-center">
+                  <Icon
+                    name="Search"
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                  />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search markets..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-48 sm:w-56 bg-[#1a1a1a] border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors font-inter"
+                  />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  aria-label="Search"
+                  onClick={() => setSearchOpen(true)}
+                  className="box-border flex flex-row items-center justify-center p-3 w-10 h-9 rounded-lg flex-none text-white hover:bg-white/10 transition-colors"
+                >
+                  <Icon name="Search" size={16} />
+                </button>
+              )}
+            </div>
+            <button
+              type="button"
+              aria-label="Filter"
+              aria-expanded={filterOpen}
+              onClick={() => setFilterOpen((o) => !o)}
+              className={`box-border flex flex-row items-center justify-center p-3 w-10 h-9 rounded-lg flex-none text-white transition-colors ${
+                filterOpen ? "bg-white/10" : "hover:bg-white/10"
+              }`}
+            >
+              <Icon name="Filter" size={16} />
+            </button>
+            {/* View density dropdown: hidden on mobile; on tablet only 2 cols + list; on desktop all 3 */}
+            <div className="relative flex-none hidden md:block" ref={viewDropdownRef}>
+              <button
+                type="button"
+                aria-label="View layout"
+                aria-expanded={viewDropdownOpen}
+                aria-haspopup="true"
+                onClick={() => setViewDropdownOpen((o) => !o)}
+                className={`box-border flex flex-row items-center justify-center p-3 w-10 h-9 rounded-lg text-white transition-colors ${
+                  viewDropdownOpen ? "bg-white/10" : "hover:bg-white/10"
+                }`}
+              >
+                {viewCols === 3 && (
+                  <svg width="21" height="14" viewBox="0 0 21 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
+                    <path d="M5.66667 1H1V5.66667H5.66667V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M13 1H8.33333V5.66667H13V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M13 8.33333H8.33333V13H13V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M5.66667 8.33333H1V13H5.66667V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M20.1667 1H15.5V5.66667H20.1667V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M20.1667 8.33333H15.5V13H20.1667V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+                {viewCols === 2 && (
+                  <svg width="21" height="14" viewBox="0 0 21 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
+                    <path d="M9.16667 1H4.5V5.66667H9.16667V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16.5 1H11.8333V5.66667H16.5V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16.5 8.33333H11.8333V13H16.5V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M9.16667 8.33333H4.5V13H9.16667V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+                {viewCols === 1 && (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
+                    <path d="M5.33333 4H14M5.33333 8H14M5.33333 12H14M2 4H2.00667M2 8H2.00667M2 12H2.00667" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
+              {viewDropdownOpen && (
+                <div className="absolute right-0 top-full mt-1 py-1 min-w-[220px] bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl z-50">
+                  {[
+                    { cols: 3, label: "Compact grid (3 columns)", icon: "grid3", showFrom: "lg" },
+                    { cols: 2, label: "Standard grid (2 columns)", icon: "grid2", showFrom: "md" },
+                    { cols: 1, label: "List view (1 column)", icon: "list", showFrom: "md" },
+                  ].map(({ cols, label, icon, showFrom }) => (
+                    <button
+                      key={cols}
+                      type="button"
+                      onClick={() => { setViewCols(cols); setViewDropdownOpen(false); }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm font-inter transition-colors ${
+                        viewCols === cols ? "bg-yellow-500/20 text-yellow-500" : "text-gray-300 hover:bg-white/10 hover:text-white"
+                      } ${showFrom === "lg" ? "hidden lg:flex" : ""}`}
+                    >
+                      {icon === "grid3" && (
+                        <svg width="21" height="14" viewBox="0 0 21 14" fill="none" className="shrink-0" aria-hidden>
+                          <path d="M5.66667 1H1V5.66667H5.66667V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M13 1H8.33333V5.66667H13V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M13 8.33333H8.33333V13H13V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M5.66667 8.33333H1V13H5.66667V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M20.1667 1H15.5V5.66667H20.1667V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M20.1667 8.33333H15.5V13H20.1667V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                      {icon === "grid2" && (
+                        <svg width="21" height="14" viewBox="0 0 21 14" fill="none" className="shrink-0" aria-hidden>
+                          <path d="M9.16667 1H4.5V5.66667H9.16667V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M16.5 1H11.8333V5.66667H16.5V1Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M16.5 8.33333H11.8333V13H16.5V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M9.16667 8.33333H4.5V13H9.16667V8.33333Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                      {icon === "list" && (
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0" aria-hidden>
+                          <path d="M5.33333 4H14M5.33333 8H14M5.33333 12H14M2 4H2.00667M2 8H2.00667M2 12H2.00667" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Filter bar - shown only when filter icon is clicked (Figma Frame 48097309) */}
+      {filterOpen && (
+        <div className="box-border flex flex-col items-start w-full py-4 px-4 md:px-20 gap-4 border-b border-[rgba(60,60,67,0.29)] bg-[#080808] flex-none">
+          <div className="flex flex-row items-center gap-2 w-full max-w-7xl mx-auto">
+            {/* Filter by: label */}
+            <div className="box-border flex flex-row justify-center items-center p-2 gap-2 flex-none rounded-lg">
+              <span className="font-inter font-normal text-sm leading-5 text-[#787878] flex items-center">
+                Filter by:
+              </span>
+            </div>
+            {/* Tabs */}
+            <div className="flex flex-row items-center gap-2 overflow-x-auto no-scrollbar flex-wrap">
+              {["all", "hot", "live", "time", "volume", "ended"].map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setActiveSortFilter(filter)}
+                  className={`box-border flex flex-row items-center justify-center gap-1.5 py-2 px-4 rounded-[10px] shrink-0 font-inter text-sm leading-[17px] tracking-[0.63px] capitalize transition-colors ${
+                    activeSortFilter === filter
+                      ? "bg-[rgba(250,204,21,0.2)] border border-[#EBB30B] font-semibold text-white"
+                      : "bg-[rgba(60,60,67,0.3)] border border-[rgba(116,116,128,0.08)] font-normal text-[#B3B3B3] hover:text-white hover:border-white/20"
+                  }`}
+                >
+                  {filter === "hot" && <Icon name="FlameFilled" size={12} />}
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MAIN CONTENT - MARKETS GRID */}
       <div className="max-w-7xl mx-auto p-4 lg:p-6 relative z-10">
         {/* Header Stats REMOVED */}
-
-        {/* Section Title Replaced with Filters */}
-        <div className="flex items-center gap-4 text-sm text-gray-400 mb-6 overflow-x-auto no-scrollbar">
-          <span className="font-bold text-white shrink-0">Filter by:</span>
-
-          {["all", "hot", "live", "time", "volume", "ended"].map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setActiveSortFilter(filter)}
-              className={`transition-colors flex items-center gap-1 font-medium px-4 py-1.5 rounded-full border shrink-0 capitalize ${
-                activeSortFilter === filter
-                  ? "text-yellow-500 bg-white/5 border-yellow-500/20"
-                  : "text-gray-400 border-transparent hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              {filter === "hot" && <Icon name="FlameFilled" size={12} />}
-              {filter}
-            </button>
-          ))}
-        </div>
 
         {/* Loading State */}
         {loading && (
@@ -495,237 +563,141 @@ const AllMarkets = () => {
           </div>
         )}
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Grid - responsive 1 / 2 / 3 columns by view density */}
+        <div
+          className={`grid gap-6 ${
+            viewCols === 3
+              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              : viewCols === 2
+                ? "grid-cols-1 md:grid-cols-2"
+                : "grid-cols-1"
+          }`}
+        >
           {!loading && !error && visibleMarkets.length > 0 ? (
             visibleMarkets.map((market, index) => {
               const closingTime = market.closingTime || getTimeValue(market.closes);
               const isExpired = closingTime < TODAY;
+              const closesInText = getClosesInDays(closingTime);
+              const yesPct = Math.round((market.yesPrice || 0) * 100);
+              const categoryIcon = categories.find((c) => c.id === market.category)?.icon ?? "Menu";
               return (
                 <div
                   key={market.id}
-                  className={`group bg-[#0f0f0f] border rounded-2xl overflow-hidden transition-all duration-300 flex flex-col animate-fade-in-up 
-                                ${
-                                  isExpired
-                                    ? "border-white/5 opacity-60 grayscale-[0.8] hover:opacity-80"
-                                    : "border-white/5 hover:border-yellow-500/30 hover:shadow-[0_0_20px_rgba(234,179,8,0.05)]"
-                                }`}
+                  className={`flex flex-col justify-center items-end p-3 gap-3 rounded-2xl min-w-0 transition-all duration-300 animate-fade-in-up ${
+                    isExpired
+                      ? "bg-[rgba(116,116,128,0.05)] opacity-70 cursor-not-allowed"
+                      : "bg-[rgba(116,116,128,0.08)] hover:bg-[rgba(116,116,128,0.12)]"
+                  }`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  {/* Card Header */}
-                  <div className="p-5 border-b border-white/5 relative">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-center gap-3">
-                        {/* Main Icon - Category Icon (Larger) */}
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            isExpired
-                              ? "bg-white/5 text-gray-500"
-                              : "bg-white/10 text-yellow-500"
-                          }`}
-                        >
-                          <Icon
-                            name={
-                              categories.find((c) => c.id === market.category)
-                                ?.icon ?? "Menu"
-                            }
-                            size={20}
-                          />
-                        </div>
-
-                        {/* Category Label */}
-                        <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                          {market.category}
-                        </span>
-                      </div>
-
-                      {/* STATUS BADGES */}
-                      <div className="flex gap-2">
-                        {isExpired ? (
-                          <span className="bg-gray-800 text-gray-400 border border-gray-700 text-[10px] font-black px-2 py-0.5 rounded uppercase">
-                            Ended
-                          </span>
-                        ) : (
-                          <>
-                            <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[10px] font-black px-2 py-0.5 rounded uppercase flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                              Live
-                            </span>
-                            {market.isHot && (
-                              <span className="bg-rose-500/10 text-rose-500 border border-rose-500/20 text-[10px] font-black px-2 py-0.5 rounded uppercase flex items-center gap-1">
-                                <Icon
-                                  name="FlameFilled"
-                                  size={12}
-                                  className="mr-0.5"
-                                />
-                                Hot
+                        {/* Tags: Closes in X days, High activity, Live */}
+                        <div className="flex flex-row items-center gap-1 w-full flex-wrap">
+                          <div className="flex flex-row items-center gap-1 flex-1 min-w-0">
+                            {closesInText && (
+                              <span className="box-border flex flex-row items-start py-1 px-1.5 rounded bg-[#080808] font-inter font-normal text-[10px] leading-3 text-[#8E8E93] flex-none">
+                                {closesInText}
                               </span>
                             )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <h3
-                      className={`text-lg font-bold uppercase leading-snug mb-3 transition-colors ${
-                        isExpired
-                          ? "text-gray-400"
-                          : "text-white group-hover:text-yellow-500"
-                      }`}
-                    >
-                      {market.question}
-                    </h3>
-
-                    <div className="flex justify-between items-end">
-                      <div className="text-xs font-medium text-gray-500">
-                        {isExpired ? "Closed:" : "Closes:"}
-                      </div>
-                      <div
-                        className={`text-xs font-bold font-mono px-2 py-1 rounded border flex items-center gap-1.5 ${
-                          isExpired
-                            ? "bg-white/5 border-white/5 text-gray-500"
-                            : "bg-white/5 border-white/5 text-white"
-                        }`}
-                      >
-                        <Icon
-                          name="Clock"
-                          size={12}
-                          className={
-                            isExpired ? "text-gray-500" : "text-yellow-500"
-                          }
-                        />
-                        {market.closes}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Outcomes */}
-                  <div className="p-5 flex-1 flex flex-col justify-center">
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      {/* YES BUTTON */}
-                      <button
-                        disabled={isExpired}
-                        className={`relative overflow-hidden border rounded-xl p-3 text-left transition-all group/btn 
-                                            ${
-                                              isExpired
-                                                ? "bg-[#1a1a1a] border-white/5 cursor-not-allowed"
-                                                : "bg-[#0e2a1e] border-emerald-500/30 hover:border-emerald-500 cursor-default"
-                                            }`}
-                      >
-                        <div className="flex justify-between items-start mb-1">
-                          <div
-                            className={`text-[10px] font-bold uppercase tracking-widest ${
-                              isExpired ? "text-gray-600" : "text-emerald-500"
-                            }`}
-                          >
-                            Yes
+                            {!isExpired && market.isHot && (
+                              <span className="box-border flex flex-row items-center py-1 px-1.5 gap-1 rounded bg-[#080808] font-inter font-normal text-[10px] leading-3 text-[#8E8E93] flex-none">
+                                <Icon name="TrendingUp" size={12} className="shrink-0 border border-[#EBB30B] rounded" />
+                                High activity
+                              </span>
+                            )}
+                            {!isExpired && (
+                              <span className="box-border flex flex-row items-center py-1 px-1.5 gap-1 rounded font-inter font-medium text-[10px] leading-3 tracking-wide text-[#22C55E] flex-none">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shadow-[0_0_5px_rgba(16,185,129,0.8)]" />
+                                Live
+                              </span>
+                            )}
+                            {isExpired && (
+                              <span className="box-border flex flex-row items-center py-1 px-1.5 rounded bg-[#080808] font-inter font-normal text-[10px] leading-3 text-[#8E8E93]">
+                                Ended
+                              </span>
+                            )}
                           </div>
-                          {!isExpired && (
-                            <div className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </div>
+
+                        {/* Question block - not a link when closed */}
+                        {isExpired ? (
+                          <div className="w-full min-w-0 pointer-events-none">
+                            <div className="box-border flex flex-col justify-center items-end p-3 gap-3 rounded-[10px] bg-[rgba(116,116,128,0.08)] w-full">
+                              <div className="flex flex-row items-center gap-4 w-full min-w-0">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-none bg-[#F7931A] text-white">
+                                  <Icon name={categoryIcon} size={16} />
+                                </div>
+                                <h3 className="font-inter font-semibold text-base leading-6 flex-1 min-w-0 text-[#8E8E93]">
+                                  {market.question}
+                                </h3>
+                              </div>
                             </div>
+                          </div>
+                        ) : (
+                          <a href={`/market/${market.slug}`} className="w-full min-w-0">
+                            <div className="box-border flex flex-col justify-center items-end p-3 gap-3 rounded-[10px] bg-[rgba(116,116,128,0.08)] w-full">
+                              <div className="flex flex-row items-center gap-4 w-full min-w-0">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-none bg-[#F7931A] text-white">
+                                  <Icon name={categoryIcon} size={16} />
+                                </div>
+                                <h3 className="font-inter font-semibold text-base leading-6 flex-1 min-w-0 text-white">
+                                  {market.question}
+                                </h3>
+                              </div>
+                            </div>
+                          </a>
+                        )}
+
+                        {/* Yes / No buttons - not links when closed */}
+                        <div className="flex flex-row justify-center items-center w-full gap-2">
+                          {isExpired ? (
+                            <>
+                              <span className="flex flex-row justify-center items-center py-1 px-4 gap-2 rounded-lg flex-1 min-w-0 backdrop-blur-sm font-inter font-medium text-sm leading-7 text-center bg-[#1a1a1a] text-[#757575] cursor-not-allowed pointer-events-none">
+                                Yes
+                              </span>
+                              <span className="flex flex-row justify-center items-center py-1 px-4 gap-2 rounded-lg flex-1 min-w-0 font-inter font-medium text-sm leading-7 text-center bg-[#1a1a1a] text-[#757575] cursor-not-allowed pointer-events-none">
+                                No
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <a
+                                href={`/market/${market.slug}`}
+                                className="flex flex-row justify-center items-center py-1 px-4 gap-2 rounded-lg flex-1 min-w-0 backdrop-blur-sm font-inter font-medium text-sm leading-7 text-center text-white bg-[#31A75C] hover:opacity-90 transition-opacity"
+                              >
+                                Yes
+                              </a>
+                              <a
+                                href={`/market/${market.slug}`}
+                                className="flex flex-row justify-center items-center py-1 px-4 gap-2 rounded-lg flex-1 min-w-0 font-inter font-medium text-sm leading-7 text-center text-white bg-[#FF2D55] hover:opacity-90 transition-opacity"
+                              >
+                                No
+                              </a>
+                            </>
                           )}
                         </div>
-                        <div
-                          className={`text-xl font-mono font-bold transition-colors ${
-                            isExpired
-                              ? "text-gray-500"
-                              : "text-emerald-400 group-hover/btn:text-white"
-                          }`}
-                        >
-                          ${market.yesPrice.toFixed(2)}
-                        </div>
-                        {!isExpired && (
-                          <div className="absolute right-0 bottom-0 p-2 opacity-10 group-hover/btn:opacity-20">
-                            <Icon name="ArrowUp" size={32} />
-                          </div>
-                        )}
-                      </button>
 
-                      {/* NO BUTTON */}
-                      <button
-                        disabled={isExpired}
-                        className={`relative overflow-hidden border rounded-xl p-3 text-left transition-all group/btn 
-                                            ${
-                                              isExpired
-                                                ? "bg-[#1a1a1a] border-white/5 cursor-not-allowed"
-                                                : "bg-[#2a0e0e] border-rose-500/30 hover:border-rose-500 cursor-default"
-                                            }`}
-                      >
-                        <div className="flex justify-between items-start mb-1">
-                          <div
-                            className={`text-[10px] font-bold uppercase tracking-widest ${
-                              isExpired ? "text-gray-600" : "text-rose-500"
-                            }`}
-                          >
-                            No
+                        {/* Footer: clock + outcome bar */}
+                        <div className="box-border flex flex-row items-center pt-3 px-4 w-full gap-1.5 border-t border-[rgba(120,120,128,0.16)]">
+                          <div className="flex flex-row items-center gap-1.5 flex-1 min-w-0">
+                            <Icon name="Clock" size={16} className="shrink-0 text-[#757575]" />
+                            <span className="font-inter font-normal text-xs leading-7 text-[#757575]">
+                              {isExpired ? "Closed" : market.closes}
+                            </span>
                           </div>
-                          {!isExpired && (
-                            <div className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                          <div className="flex flex-row items-center gap-1 shrink-0">
+                            <div className="flex flex-row rounded-full overflow-hidden bg-[#FF2D55] min-w-[3rem]">
+                              <div className="h-2 rounded-l-full bg-[#31A75C]" style={{ width: `${yesPct}%` }} />
                             </div>
-                          )}
-                        </div>
-                        <div
-                          className={`text-xl font-mono font-bold transition-colors ${
-                            isExpired
-                              ? "text-gray-500"
-                              : "text-rose-400 group-hover/btn:text-white"
-                          }`}
-                        >
-                          ${market.noPrice.toFixed(2)}
-                        </div>
-                        {!isExpired && (
-                          <div className="absolute right-0 bottom-0 p-2 opacity-10 group-hover/btn:opacity-20">
-                            <Icon name="ArrowDown" size={32} />
+                            <span className={`font-inter font-medium text-sm leading-[15px] tracking-wide uppercase ${isExpired ? "text-[#757575]" : "text-[#22C55E]"}`}>
+                              {yesPct}%
+                            </span>
                           </div>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="p-4 bg-[#0a0a0a] border-t border-white/5 flex items-center justify-between">
-                    <div>
-                      <div className="text-[10px] text-gray-500 font-bold uppercase">
-                        Volume
-                      </div>
-                      <div
-                        className={`text-sm font-mono font-bold ${
-                          isExpired ? "text-gray-500" : "text-white"
-                        }`}
-                      >
-                        ${market.volume}
-                      </div>
-                    </div>
-
-                    {isExpired ? (
-                      <button
-                        disabled
-                        className="flex items-center gap-2 font-black text-xs uppercase px-6 py-3 rounded-lg transition-all transform bg-[#1a1a1a] text-gray-500 cursor-not-allowed"
-                      >
-                        Ended
-                      </button>
-                    ) : (
-                      <a
-                        href={`/market/${market.slug}`}
-                        className="flex items-center gap-2 font-black text-xs uppercase px-6 py-3 rounded-lg transition-all transform bg-gradient-to-r from-yellow-600 to-yellow-400 text-black shadow-[0_0_10px_rgba(234,179,8,0.2)] hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] hover:-translate-y-0.5 active:translate-y-0"
-                      >
-                        <span className="relative flex h-2 w-2 mr-1">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-50"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-black"></span>
-                        </span>
-                        Trade
-                      </a>
-                    )}
-                  </div>
+                        </div>
                 </div>
               );
             })
           ) : (
-            <div className="col-span-full py-20 text-center flex flex-col items-center justify-center opacity-50">
+            <div className="w-full py-20 text-center flex flex-col items-center justify-center opacity-50">
               <Icon name="Search" size={48} className="mb-4 text-gray-600" />
               <h3 className="text-xl font-bold text-white">No markets found</h3>
               <p className="text-gray-500">
