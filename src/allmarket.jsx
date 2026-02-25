@@ -697,10 +697,10 @@ const AllMarkets = () => {
               );
             })
           ) : (
-            <div className="w-full py-20 text-center flex flex-col items-center justify-center opacity-50">
-              <Icon name="Search" size={48} className="mb-4 text-gray-600" />
+            <div className="col-span-full w-full min-w-full min-h-[60vh] flex flex-col items-center justify-center text-center opacity-80">
+              <Icon name="Search" size={48} className="mb-4 text-gray-500" />
               <h3 className="text-xl font-bold text-white">No markets found</h3>
-              <p className="text-gray-500">
+              <p className="text-gray-500 mt-1">
                 Try adjusting your filters or search query.
               </p>
             </div>
