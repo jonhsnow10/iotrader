@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAccount, useDisconnect } from "wagmi";
 import { useCollateral } from "@orderly.network/hooks";
@@ -18,7 +18,27 @@ const Header = ({ activePage = "" }) => {
   const moreMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const walletDropdownRef = useRef(null);
+  const navRef = useRef(null);
+  const [menuTopPx, setMenuTopPx] = useState(56); // fallback 56px
   const location = useLocation();
+
+  const updateMenuTop = () => {
+    if (navRef.current) {
+      const bottom = navRef.current.getBoundingClientRect().bottom;
+      setMenuTopPx(bottom);
+    }
+  };
+
+  useLayoutEffect(() => {
+    if (isMobileMenuOpen) updateMenuTop();
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const onResize = () => updateMenuTop();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -58,7 +78,7 @@ const Header = ({ activePage = "" }) => {
 
   return (
     <>
-      <nav className="bg-[#050505] border-b border-yellow-500/20 px-4 lg:px-6 py-4 flex justify-between items-center sticky top-0 z-50 backdrop-blur-md bg-[#050505]/80">
+      <nav ref={navRef} className="min-h-14 bg-[#050505] border-b border-white/20 px-4 lg:px-6 flex justify-between items-center sticky top-0 z-50 backdrop-blur-md bg-[#050505]/80 shrink-0" style={{ fontFamily: "var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif" }}>
         <div className="flex items-center gap-4">
           <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2">
             <img
@@ -71,7 +91,7 @@ const Header = ({ activePage = "" }) => {
           
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden text-gray-400 hover:text-yellow-400 transition-colors p-2"
+            className="lg:hidden text-white/70 hover:text-[var(--color-accent-primary)] transition-colors p-2"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -93,8 +113,8 @@ const Header = ({ activePage = "" }) => {
               to={item.href}
               className={
                 isActive
-                  ? "text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500"
-                  : "hover:text-yellow-400 transition-colors"
+                  ? "text-[var(--color-accent-primary)]"
+                  : "text-white/70 hover:text-[var(--color-accent-primary)] transition-colors"
               }
             >
               {item.name}
@@ -109,8 +129,8 @@ const Header = ({ activePage = "" }) => {
             onClick={() => setIsMoreOpen(!isMoreOpen)}
             className={`flex items-center cursor-pointer transition-colors ${
               isMoreOpen 
-                ? "text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500"
-                : "text-gray-400 hover:text-yellow-400"
+                ? "text-[var(--color-accent-primary)]"
+                : "text-white/70 hover:text-[var(--color-accent-primary)]"
             }`}
           >
             <span>More</span>
@@ -124,7 +144,7 @@ const Header = ({ activePage = "" }) => {
           </button>
           
           {isMoreOpen && (
-            <div className="absolute top-full right-0 mt-2 w-56 bg-[#0a0a0a] border border-yellow-500/30 rounded-lg shadow-xl z-50 overflow-hidden">
+            <div className="absolute top-full right-0 mt-2 w-56 bg-[var(--color-background)] border border-white/20 rounded-lg shadow-xl z-50 overflow-hidden">
               <div className="py-2">
                 {moreMenuItems.map((item) => {
                   const isActive = location.pathname === item.href;
@@ -133,10 +153,10 @@ const Header = ({ activePage = "" }) => {
                       key={item.name}
                       to={item.href}
                       onClick={() => setIsMoreOpen(false)}
-                      className={`block px-4 py-2 text-sm font-bold transition-colors ${
+                      className={`block px-4 py-2 text-sm font-semibold transition-colors ${
                         isActive
-                          ? "text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500 bg-yellow-500/10"
-                          : "text-gray-400 hover:text-yellow-400 hover:bg-white/5"
+                          ? "text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10"
+                          : "text-white/70 hover:text-[var(--color-accent-primary)] hover:bg-[var(--color-background-hover)]"
                       }`}
                     >
                       {item.name}
@@ -227,36 +247,24 @@ const Header = ({ activePage = "" }) => {
     </nav>
 
       {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
-          onClick={() => setIsMobileMenuOpen(false)}
-        >
+        <>
+          {/* Overlay: always below navbar (measured so it works with ticker/other top content) */}
+          <div
+            className="fixed inset-x-0 bottom-0 z-40 lg:hidden transition-opacity duration-300 bg-black/80 backdrop-blur-sm"
+            style={{ top: `${menuTopPx}px` }}
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
           <div
             ref={mobileMenuRef}
-            className="fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-[#0a0a0a] border-r border-yellow-500/20 shadow-2xl overflow-y-auto z-50 transform transition-transform duration-300 ease-in-out"
+            className="fixed left-0 bottom-0 w-80 max-w-[85vw] bg-[var(--color-background)] border-r border-white/20 shadow-2xl overflow-y-auto z-50 transform transition-transform duration-300 ease-in-out lg:hidden"
+            style={{ top: `${menuTopPx}px`, fontFamily: "var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 border-b border-yellow-500/20">
-              <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
-                <img
-                  src="/logo.png"
-                  alt="IO Trader"
-                  className="h-8 object-contain"
-                />
-              </Link>
-              <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-400 hover:text-yellow-400 transition-colors p-2"
-                aria-label="Close menu"
-              >
-                <Icon name="X" size={24} />
-              </button>
-            </div>
-
             <div className="py-4">
               <div className="px-4 space-y-1 mb-4">
                 {navItems.map((item) => {
-                  const isActive = location.pathname === item.href || 
+                  const isActive = location.pathname === item.href ||
                     (item.href === "/" && location.pathname === "/") ||
                     (item.href !== "/" && location.pathname.startsWith(item.href));
                   return (
@@ -264,10 +272,10 @@ const Header = ({ activePage = "" }) => {
                       key={item.name}
                       to={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-4 py-3 text-sm font-bold transition-colors rounded-lg ${
+                      className={`block px-4 py-3 text-sm font-semibold transition-colors rounded-lg ${
                         isActive
-                          ? "text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500 bg-yellow-500/10"
-                          : "text-gray-400 hover:text-yellow-400 hover:bg-white/5"
+                          ? "text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10"
+                          : "text-white/70 hover:text-[var(--color-accent-primary)] hover:bg-[var(--color-background-hover)]"
                       }`}
                     >
                       {item.name}
@@ -276,10 +284,10 @@ const Header = ({ activePage = "" }) => {
                 })}
               </div>
 
-              <div className="border-t border-yellow-500/20 my-4"></div>
+              <div className="border-t border-white/20 my-4" />
 
               <div className="px-4">
-                <div className="text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-2 mb-2">
+                <div className="text-xs font-semibold text-white/50 uppercase tracking-wider px-4 py-2 mb-2">
                   More
                 </div>
                 <div className="space-y-1">
@@ -290,10 +298,10 @@ const Header = ({ activePage = "" }) => {
                         key={item.name}
                         to={item.href}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className={`block px-4 py-3 text-sm font-bold transition-colors rounded-lg ${
+                        className={`block px-4 py-3 text-sm font-semibold transition-colors rounded-lg ${
                           isActive
-                            ? "text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500 bg-yellow-500/10"
-                            : "text-gray-400 hover:text-yellow-400 hover:bg-white/5"
+                            ? "text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10"
+                            : "text-white/70 hover:text-[var(--color-accent-primary)] hover:bg-[var(--color-background-hover)]"
                         }`}
                       >
                         {item.name}
@@ -304,7 +312,7 @@ const Header = ({ activePage = "" }) => {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );
