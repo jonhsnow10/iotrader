@@ -1,6 +1,7 @@
 import React, { useState, Component } from 'react';
 import { usePositionStream, useOrderStream, useSubAccountMutation } from '@orderly.network/hooks';
 import { OrderSide, OrderStatus, OrderType } from '@orderly.network/types';
+import { DepthChart } from './DepthChart';
 
 function DetailsContent({ symbol }) {
   const base = symbol?.match?.(/^(?:PERP|SPOT)_([A-Z]+)_([A-Z]+)$/)?.[1] || 'BTC';
@@ -141,11 +142,11 @@ export function MobileTradingTabs({
               </div>
             </div>
             <div
-              className={`w-full flex items-center justify-center py-10 ${
-                activeTab === 'depth' ? '' : 'hidden'
+              className={`w-full flex flex-col min-h-0 overflow-hidden ${
+                activeTab === 'depth' ? 'h-[520px]' : 'hidden'
               }`}
             >
-              <p className="text-[#999999] text-sm">Depth chart coming soon</p>
+              <DepthChart symbol={symbol} />
             </div>
             <div className={`w-full ${activeTab === 'details' ? '' : 'hidden'}`}>
               <DetailsContent symbol={symbol || 'PERP_BTC_USDC'} />

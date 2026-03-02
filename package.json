@@ -22,6 +22,8 @@
     "ajv-formats": "^2.1.1",
     "axios": "^1.6.0",
     "buffer": "^6.0.3",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0",
     "crypto-browserify": "^3.12.1",
     "events": "^3.3.0",
     "lightweight-charts": "^5.0.9",
