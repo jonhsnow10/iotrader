@@ -23,11 +23,15 @@ export function FutureOrderBook({
   const orderbook = orderbookProp ?? liveOrderbook;
   const trades = tradesProp ?? (liveTrades?.trades ?? []);
 
+  const groupingDecimals = Math.max(
+    0,
+    -Math.floor(Math.log10(parseFloat(grouping) || 0.01))
+  );
   const spread =
     bids.length > 0 && asks.length > 0
       ? (parseFloat(asks[0].price) + parseFloat(bids[0].price)) / 2
       : 0;
-  const spreadDisplay = spread > 0 ? spread.toFixed(2) : '--';
+  const spreadDisplay = spread > 0 ? spread.toFixed(groupingDecimals) : '--';
 
   useEffect(() => {
     try {
@@ -37,36 +41,50 @@ export function FutureOrderBook({
 
       if (hasData) {
         const toNum = (v) => (typeof v === 'number' ? v : parseFloat(v));
+        const step = parseFloat(grouping) || 0.01;
+        const decimals = Math.max(0, -Math.floor(Math.log10(step)));
 
-        let bidCumulative = 0;
-        const formattedBids = (orderbook.bids || []).map((bid) => {
+        // Group bids: round price DOWN to nearest step, sum sizes (PermaDex behavior)
+        const bidMap = new Map();
+        for (const bid of orderbook.bids || []) {
           const price = toNum(Array.isArray(bid) ? bid[0] : bid?.price ?? 0);
           const size = toNum(Array.isArray(bid) ? bid[1] : bid?.quantity ?? 0);
-
           if (!Number.isFinite(price) || !Number.isFinite(size) || price < 0 || size < 0) {
             throw new Error('Invalid orderbook data');
           }
-
+          const grouped = Math.floor(price / step) * step;
+          bidMap.set(grouped, (bidMap.get(grouped) || 0) + size);
+        }
+        const sortedBidPrices = [...bidMap.keys()].sort((a, b) => b - a);
+        let bidCumulative = 0;
+        const formattedBids = sortedBidPrices.map((price) => {
+          const size = bidMap.get(price) || 0;
           bidCumulative += size;
           return {
-            price: price.toFixed(2),
+            price: price.toFixed(decimals),
             size: size.toFixed(3),
             total: bidCumulative.toFixed(2),
           };
         });
 
-        let askCumulative = 0;
-        const formattedAsks = (orderbook.asks || []).map((ask) => {
+        // Group asks: round price UP to nearest step, sum sizes (PermaDex behavior)
+        const askMap = new Map();
+        for (const ask of orderbook.asks || []) {
           const price = toNum(Array.isArray(ask) ? ask[0] : ask?.price ?? 0);
           const size = toNum(Array.isArray(ask) ? ask[1] : ask?.quantity ?? 0);
-
           if (!Number.isFinite(price) || !Number.isFinite(size) || price < 0 || size < 0) {
             throw new Error('Invalid orderbook data');
           }
-
+          const grouped = Math.ceil(price / step) * step;
+          askMap.set(grouped, (askMap.get(grouped) || 0) + size);
+        }
+        const sortedAskPrices = [...askMap.keys()].sort((a, b) => a - b);
+        let askCumulative = 0;
+        const formattedAsks = sortedAskPrices.map((price) => {
+          const size = askMap.get(price) || 0;
           askCumulative += size;
           return {
-            price: price.toFixed(2),
+            price: price.toFixed(decimals),
             size: size.toFixed(3),
             total: askCumulative.toFixed(2),
           };
@@ -84,7 +102,7 @@ export function FutureOrderBook({
         setDataError('Order book data error. Reconnecting...');
       });
     }
-  }, [symbol, orderbook]);
+  }, [symbol, orderbook, grouping]);
 
   const handlePriceClick = (price, side) => {
     if (typeof onPriceClick === 'function') onPriceClick(parseFloat(price), side);
@@ -362,7 +380,10 @@ function TradesView({ trades, symbol }) {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-      <div className="flex flex-shrink-0 justify-between pl-3 pr-3 sm:pl-4 sm:pr-3 pb-1 text-xs font-medium text-[#9CA3AF]" style={{ fontWeight: 500 }}>
+      <div
+        className="flex flex-shrink-0 justify-between pl-3 pr-3 sm:pl-4 sm:pr-3 pb-1 text-xs font-medium text-[#9CA3AF]"
+        style={{ fontFamily: 'var(--font-geist-sans), sans-serif', fontWeight: 500 }}
+      >
         <span className="min-w-0 truncate">Price ({quote})</span>
         <span className="min-w-0 truncate text-right">Size ({base})</span>
         <span className="min-w-0 truncate text-right">Time</span>
@@ -379,7 +400,7 @@ function TradesView({ trades, symbol }) {
         ) : (
           trades.map((trade, index) => {
             const price = trade.executed_price || trade.price || 0;
-            const quantity = trade.executed_quantity || trade.quantity || 0;
+            const quantity = trade.executed_quantity || trade.quantity || trade.size || 0;
             const timestamp = trade.executed_timestamp || trade.timestamp || trade.ts || trade.time || 0;
             const side = (trade.side || 'BUY').toUpperCase();
             return (
