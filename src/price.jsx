@@ -1601,7 +1601,7 @@ const MarketDetail = () => {
         ) : (
           <>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-fade-in-up">
-          <div className="lg:col-span-8 flex flex-col gap-6 rounded-2xl bg-[rgba(116,116,128,0.08)] box-border">
+          <div className="lg:col-span-8 px-[15px] py-[25px] flex flex-col gap-6 rounded-2xl bg-[rgba(116,116,128,0.08)] box-border">
             <MarketHeader marketData={marketData} />
             <PriceChart chartData={chartData} />
           </div>
