@@ -50,7 +50,9 @@ const CoinMarketInfo = () => {
               market_cap: parseFloat(ticker.quoteVolume) || 0,
               total_volume: parseFloat(ticker.quoteVolume) || 0,
               circulating_supply: 0, // Binance doesn't provide this
-              image: `https://cryptoicons.org/api/icon/${symbol.toLowerCase()}/200`, // Placeholder image URL
+              // Try Orderly CDN first (same as futures UI), then cryptoicons.org fallback
+              image: `https://oss.orderly.network/static/symbol_logo/${symbol}.png`,
+              imageFallback: `https://cryptoicons.org/api/icon/${symbol.toLowerCase()}/200`,
             };
           })
           .sort((a, b) => b.market_cap - a.market_cap) // Sort by market cap (volume)
@@ -346,6 +348,29 @@ const CoinMarketInfo = () => {
                       {/* Coin */}
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
+                          {(coin.image || coin.imageFallback) && (
+                            <img
+                              src={coin.image || coin.imageFallback}
+                              alt={coin.symbol}
+                              className="w-8 h-8 rounded-full object-cover bg-white/5 shrink-0"
+                              onError={(e) => {
+                                const img = e.target;
+                                const fallback = coin.imageFallback;
+                                if (fallback && img.src !== fallback) {
+                                  img.src = fallback;
+                                } else {
+                                  img.style.display = "none";
+                                  img.nextElementSibling?.classList.remove("hidden");
+                                }
+                              }}
+                            />
+                          )}
+                          <div
+                            className={`w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-sm shrink-0 ${coin.image ? "hidden" : ""}`}
+                            aria-hidden
+                          >
+                            {coin.symbol?.charAt(0) || "?"}
+                          </div>
                           <div>
                             <p className="text-white font-bold text-sm">{coin.name}</p>
                             <p className="text-gray-400 text-xs uppercase">{coin.symbol}</p>
